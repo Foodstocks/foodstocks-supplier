@@ -12,30 +12,28 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // Check if already seeded
     const existingUser = await prisma.user.findFirst()
     if (existingUser) {
-      return NextResponse.json({ ok: true, message: 'Database already seeded' })
+      return NextResponse.json({ ok: true, message: 'Already seeded' })
     }
 
     const password = await bcrypt.hash('demo123', 10)
 
-    // Suppliers
-    const s1 = await prisma.supplier.create({ data: { brandName: 'Dapur Nusantara', slug: 'dapur-nusantara', description: 'Produk makanan tradisional Indonesia', city: 'Jakarta', contactPhone: '081234567890', tier: 'LARGE', isActive: true, joinedAt: new Date('2023-01-15') } })
-    const s2 = await prisma.supplier.create({ data: { brandName: 'Bumbu Rempah Co', slug: 'bumbu-rempah-co', description: 'Spesialis bumbu dan rempah premium', city: 'Surabaya', contactPhone: '082345678901', tier: 'MEDIUM', isActive: true, joinedAt: new Date('2023-03-20') } })
-    const s3 = await prisma.supplier.create({ data: { brandName: 'Snack Viral ID', slug: 'snack-viral-id', description: 'Camilan kekinian yang viral di media sosial', city: 'Bandung', contactPhone: '083456789012', tier: 'MEDIUM', isActive: true, joinedAt: new Date('2023-06-10') } })
-    const s4 = await prisma.supplier.create({ data: { brandName: 'Frozen Fresh', slug: 'frozen-fresh', description: 'Makanan beku berkualitas tinggi', city: 'Medan', contactPhone: '084567890123', tier: 'SMALL', isActive: true, joinedAt: new Date('2023-09-05') } })
-    const s5 = await prisma.supplier.create({ data: { brandName: 'Healthy Bites', slug: 'healthy-bites', description: 'Makanan sehat dan organik', city: 'Yogyakarta', contactPhone: '085678901234', tier: 'SMALL', isActive: false, joinedAt: new Date('2023-11-20') } })
+    // Admin user (no supplier)
+    await prisma.user.create({ data: { email: 'admin@demo.com', password, name: 'Admin FoodStocks', role: 'ADMIN' } })
 
-    // Users
-    await prisma.user.createMany({ data: [
-      { email: 'supplier@demo.com', password, name: 'Demo Supplier', role: 'SUPPLIER', supplierId: s1.id },
-      { email: 'supplier2@demo.com', password, name: 'Bumbu Supplier', role: 'SUPPLIER', supplierId: s2.id },
-      { email: 'supplier3@demo.com', password, name: 'Snack Supplier', role: 'SUPPLIER', supplierId: s3.id },
-      { email: 'supplier4@demo.com', password, name: 'Frozen Supplier', role: 'SUPPLIER', supplierId: s4.id },
-      { email: 'supplier5@demo.com', password, name: 'Healthy Supplier', role: 'SUPPLIER', supplierId: s5.id },
-      { email: 'admin@demo.com', password, name: 'Admin FoodStocks', role: 'ADMIN', supplierId: null },
-    ]})
+    // Create users + suppliers together
+    const u1 = await prisma.user.create({ data: { email: 'supplier@demo.com', password, name: 'Demo Supplier', role: 'SUPPLIER' } })
+    const u2 = await prisma.user.create({ data: { email: 'supplier2@demo.com', password, name: 'Bumbu Supplier', role: 'SUPPLIER' } })
+    const u3 = await prisma.user.create({ data: { email: 'supplier3@demo.com', password, name: 'Snack Supplier', role: 'SUPPLIER' } })
+    const u4 = await prisma.user.create({ data: { email: 'supplier4@demo.com', password, name: 'Frozen Supplier', role: 'SUPPLIER' } })
+    const u5 = await prisma.user.create({ data: { email: 'supplier5@demo.com', password, name: 'Healthy Supplier', role: 'SUPPLIER' } })
+
+    const s1 = await prisma.supplier.create({ data: { userId: u1.id, brandName: 'Dapur Nusantara', description: 'Produk makanan tradisional Indonesia', city: 'Jakarta', contactPhone: '081234567890', tier: 'LARGE', isActive: true, joinedAt: new Date('2023-01-15') } })
+    const s2 = await prisma.supplier.create({ data: { userId: u2.id, brandName: 'Bumbu Rempah Co', description: 'Spesialis bumbu dan rempah premium', city: 'Surabaya', contactPhone: '082345678901', tier: 'MEDIUM', isActive: true, joinedAt: new Date('2023-03-20') } })
+    const s3 = await prisma.supplier.create({ data: { userId: u3.id, brandName: 'Snack Viral ID', description: 'Camilan kekinian yang viral di media sosial', city: 'Bandung', contactPhone: '083456789012', tier: 'MEDIUM', isActive: true, joinedAt: new Date('2023-06-10') } })
+    const s4 = await prisma.supplier.create({ data: { userId: u4.id, brandName: 'Frozen Fresh', description: 'Makanan beku berkualitas tinggi', city: 'Medan', contactPhone: '084567890123', tier: 'SMALL', isActive: true, joinedAt: new Date('2023-09-05') } })
+    const s5 = await prisma.supplier.create({ data: { userId: u5.id, brandName: 'Healthy Bites', description: 'Makanan sehat dan organik', city: 'Yogyakarta', contactPhone: '085678901234', tier: 'SMALL', isActive: false, joinedAt: new Date('2023-11-20') } })
 
     // Products
     const products = await Promise.all([
@@ -58,7 +56,7 @@ export async function POST(req: NextRequest) {
       prisma.product.create({ data: { supplierId: s5.id, name: 'Smoothie Sayur Hijau', sku: 'HB-002', category: 'Minuman Sehat', priceSupplier: 20000, priceSell: 35000, currentStock: 150, stockThreshold: 30 } }),
     ])
 
-    // Daily sales (last 30 days, simplified)
+    // Daily sales (last 30 days)
     const channels: Array<'SHOPEE' | 'TIKTOK' | 'WEBSITE' | 'RESELLER'> = ['SHOPEE', 'TIKTOK', 'WEBSITE', 'RESELLER']
     const salesData: Array<{ productId: string; saleDate: Date; channel: 'SHOPEE' | 'TIKTOK' | 'WEBSITE' | 'RESELLER'; unitsSold: number; grossRevenue: number }> = []
 
@@ -69,17 +67,10 @@ export async function POST(req: NextRequest) {
         date.setHours(0, 0, 0, 0)
         const units = Math.floor(Math.random() * 20) + 1
         const channel = channels[Math.floor(Math.random() * channels.length)]
-        salesData.push({
-          productId: product.id,
-          saleDate: date,
-          channel,
-          unitsSold: units,
-          grossRevenue: units * product.priceSell,
-        })
+        salesData.push({ productId: product.id, saleDate: date, channel, unitsSold: units, grossRevenue: units * Number(product.priceSell) })
       }
     }
 
-    // Insert in batches
     for (let i = 0; i < salesData.length; i += 100) {
       await prisma.dailySale.createMany({ data: salesData.slice(i, i + 100), skipDuplicates: true })
     }
@@ -94,37 +85,30 @@ export async function POST(req: NextRequest) {
 
     // Ads requests
     await prisma.adsRequest.createMany({ data: [
-      { supplierId: s1.id, productId: products[0].id, packageTier: 'BOOSTER', durationDays: 30, message: 'Rendang kami lagi viral, mau boost lebih lagi', status: 'PENDING' },
-      { supplierId: s2.id, productId: products[4].id, packageTier: 'STARTER', durationDays: 14, message: 'Mau coba program iklan pertama kali', status: 'APPROVED' },
-      { supplierId: s3.id, productId: products[8].id, packageTier: 'PREMIUM', durationDays: 60, message: 'Keripik kami sudah viral, mau maksimalkan', status: 'REVIEWING' },
+      { supplierId: s1.id, productId: products[0].id, packageTier: 'BOOSTER', durationDays: 30, message: 'Rendang kami lagi viral', status: 'PENDING' },
+      { supplierId: s2.id, productId: products[4].id, packageTier: 'STARTER', durationDays: 14, message: 'Mau coba program iklan', status: 'APPROVED' },
+      { supplierId: s3.id, productId: products[8].id, packageTier: 'PREMIUM', durationDays: 60, message: 'Mau maksimalkan penjualan', status: 'REVIEWING' },
     ]})
 
-    // Compute and insert status cache
+    // Status cache
     for (const product of products) {
       const sales = salesData.filter(s => s.productId === product.id)
       const last30 = sales.reduce((a, b) => a + b.unitsSold, 0)
       const last7 = sales.filter(s => {
-        const diff = (new Date().getTime() - s.saleDate.getTime()) / (1000 * 60 * 60 * 24)
+        const diff = (Date.now() - s.saleDate.getTime()) / 86400000
         return diff <= 7
       }).reduce((a, b) => a + b.unitsSold, 0)
-
-      let status: 'FAST_MOVE' | 'NORMAL' | 'SLOW_MOVE' = 'NORMAL'
       const avgPerDay = last30 / 30
-      if (avgPerDay >= 10) status = 'FAST_MOVE'
-      else if (avgPerDay < 3) status = 'SLOW_MOVE'
+      const status: 'FAST_MOVE' | 'NORMAL' | 'SLOW_MOVE' = avgPerDay >= 10 ? 'FAST_MOVE' : avgPerDay < 3 ? 'SLOW_MOVE' : 'NORMAL'
 
       await prisma.productStatusCache.upsert({
         where: { productId: product.id },
-        update: { status, unitsLast7d: last7, unitsLast30d: last30, gmvLast30d: last30 * product.priceSell, computedAt: new Date() },
-        create: { productId: product.id, status, unitsLast7d: last7, unitsLast30d: last30, gmvLast30d: last30 * product.priceSell, computedAt: new Date() },
+        update: { status, unitsLast7d: last7, unitsLast30d: last30, gmvLast30d: last30 * Number(product.priceSell), computedAt: new Date() },
+        create: { productId: product.id, status, unitsLast7d: last7, unitsLast30d: last30, gmvLast30d: last30 * Number(product.priceSell), computedAt: new Date() },
       })
     }
 
-    return NextResponse.json({
-      ok: true,
-      message: 'Database seeded successfully',
-      data: { suppliers: 5, products: products.length, sales: salesData.length }
-    })
+    return NextResponse.json({ ok: true, message: 'Database seeded successfully', data: { suppliers: 5, products: products.length, sales: salesData.length } })
   } catch (error) {
     console.error('Seed error:', error)
     return NextResponse.json({ error: String(error) }, { status: 500 })
