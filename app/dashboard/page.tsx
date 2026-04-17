@@ -5,6 +5,7 @@ import { formatRupiah, formatNumber, STATUS_CONFIG } from '@/lib/utils'
 import Link from 'next/link'
 import SalesTrendChart from '@/components/charts/sales-trend-chart'
 import StatusDonutChart from '@/components/charts/status-donut-chart'
+import MonthlyTarget from '@/components/ui/monthly-target'
 import ProductImage from '@/components/ui/product-image'
 import {
   TrendingUp, TrendingDown, Megaphone, ArrowRight, AlertTriangle,
@@ -148,17 +149,20 @@ export default async function DashboardPage() {
           <SalesTrendChart data={data.salesTrend} />
         </div>
 
-        {/* Status Produk */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <div className="mb-5">
-            <h2 className="font-heading font-semibold text-[15px] text-gray-900">Status Produk</h2>
-            <p className="text-[12px] text-gray-400 mt-0.5">Distribusi performa SKU</p>
+        {/* Right column */}
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="mb-5">
+              <h2 className="font-heading font-semibold text-[15px] text-gray-900">Status Produk</h2>
+              <p className="text-[12px] text-gray-400 mt-0.5">Distribusi performa SKU</p>
+            </div>
+            <StatusDonutChart
+              fastMove={data.fastMoveCount}
+              normal={data.normalCount}
+              slowMove={data.slowMoveCount}
+            />
           </div>
-          <StatusDonutChart
-            fastMove={data.fastMoveCount}
-            normal={data.normalCount}
-            slowMove={data.slowMoveCount}
-          />
+          <MonthlyTarget currentGmv={data.gmvThisMonth} supplierId={user.supplierId} />
         </div>
       </div>
 

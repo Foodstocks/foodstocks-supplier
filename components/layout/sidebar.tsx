@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, Package, Megaphone, Bell,
   Users, BarChart3, LogOut, HelpCircle, Settings, ShieldCheck,
+  BarChart2, FileText, RefreshCw,
 } from 'lucide-react'
 import type { AuthUser } from '@/lib/types'
 
@@ -15,7 +16,10 @@ interface SidebarProps { user: AuthUser }
 const SUPPLIER_NAV = [
   { href: '/dashboard',               label: 'Dashboard',     icon: LayoutDashboard },
   { href: '/dashboard/products',      label: 'Produk',        icon: Package         },
+  { href: '/dashboard/analytics',     label: 'Analitik',      icon: BarChart2       },
+  { href: '/dashboard/reports',       label: 'Laporan',       icon: FileText        },
   { href: '/dashboard/ads',           label: 'Peluang Iklan', icon: Megaphone       },
+  { href: '/dashboard/restock',       label: 'Restock',       icon: RefreshCw       },
   { href: '/dashboard/notifications', label: 'Notifikasi',    icon: Bell            },
 ]
 
