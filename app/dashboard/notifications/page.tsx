@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
-import { NOTIFICATIONS } from '@/lib/mock-data'
+import { getNotifications } from '@/lib/db'
 import { formatRelativeTime } from '@/lib/utils'
 import { Bell, TrendingUp, AlertTriangle, CheckCircle, Star, Info, Package } from 'lucide-react'
 
@@ -21,9 +21,7 @@ export default async function NotificationsPage() {
   const user = await getAuthUser()
   if (!user || !user.supplierId) redirect('/login')
 
-  const notifications = NOTIFICATIONS
-    .filter((n) => n.supplierId === user.supplierId)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  const notifications = await getNotifications(user.supplierId!)
 
   const unreadCount = notifications.filter((n) => !n.isRead).length
 

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
-import { getProductsBySupplier, getProductWithStatus } from '@/lib/mock-data'
+import { getProductsBySupplier } from '@/lib/db'
 import { formatNumber, formatRupiah } from '@/lib/utils'
 import RestockForm from '@/components/ui/restock-form'
 import { AlertTriangle, Package, TrendingDown } from 'lucide-react'
@@ -11,7 +11,7 @@ export default async function RestockPage() {
   const user = await getAuthUser()
   if (!user || !user.supplierId) redirect('/login')
 
-  const products = getProductsBySupplier(user.supplierId).map(getProductWithStatus)
+  const products = await getProductsBySupplier(user.supplierId!)
   const lowStock = products.filter((p) => p.currentStock < p.stockThreshold)
 
   // Sort: low stock first, then by name

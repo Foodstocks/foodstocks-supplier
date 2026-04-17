@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
-import { getProductsBySupplier, getProductWithStatus } from '@/lib/mock-data'
+import { getProductsBySupplier } from '@/lib/db'
 import Link from 'next/link'
 import { Megaphone } from 'lucide-react'
 import ProductsView from '@/components/ui/products-view'
@@ -11,7 +11,7 @@ export default async function ProductsPage() {
   const user = await getAuthUser()
   if (!user || !user.supplierId) redirect('/login')
 
-  const products  = getProductsBySupplier(user.supplierId).map(getProductWithStatus)
+  const products  = await getProductsBySupplier(user.supplierId!)
   const fastMoves = products.filter((p) => p.status === 'fast_move').length
   const slowMoves = products.filter((p) => p.status === 'slow_move').length
 

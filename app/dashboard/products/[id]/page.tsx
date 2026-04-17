@@ -1,6 +1,6 @@
 import { redirect, notFound } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
-import { PRODUCTS, getProductWithStatus, getProductSalesTrend, getReviewsData } from '@/lib/mock-data'
+import { getProductById, getProductSalesTrend, getReviewsByProduct } from '@/lib/db'
 import ProductImage from '@/components/ui/product-image'
 
 export const dynamic = 'force-dynamic'
@@ -14,17 +14,20 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
   const user = await getAuthUser()
   if (!user || !user.supplierId) redirect('/login')
 
-  const product = PRODUCTS.find((p) => p.id === params.id && p.supplierId === user.supplierId)
-  if (!product) notFound()
+  const [withStatus, trend30, allReviews] = await Promise.all([
+    getProductById(params.id, user.supplierId!),
+    getProductSalesTrend(params.id, 30),
+    getReviewsByProduct(params.id),
+  ])
+  if (!withStatus) notFound()
 
-  const withStatus = getProductWithStatus(product)
-  const trend30    = getProductSalesTrend(product.id, 30)
-  const reviews    = getReviewsData().filter((r) => r.productId === product.id).slice(0, 5)
-  const cfg        = STATUS_CONFIG[withStatus.status]
-  const isLow      = product.currentStock < product.stockThreshold
+  const reviews = allReviews.slice(0, 5)
+  const product = withStatus
+  const cfg     = STATUS_CONFIG[withStatus.status]
+  const isLow   = product.currentStock < product.stockThreshold
   const ratingDist = [5,4,3,2,1].map((r) => ({
     star: r,
-    count: reviews.filter((rev) => rev.rating === r).length,
+    count: allReviews.filter((rev) => rev.rating === r).length,
   }))
 
   return (

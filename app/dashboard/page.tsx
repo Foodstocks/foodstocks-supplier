@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
-import { getSupplierOverviewData, SUPPLIERS } from '@/lib/mock-data'
+import { getSupplierOverviewData, getSupplierById } from '@/lib/db'
 import { formatRupiah, formatNumber, STATUS_CONFIG } from '@/lib/utils'
 import Link from 'next/link'
 import SalesTrendChart from '@/components/charts/sales-trend-chart'
@@ -51,8 +51,10 @@ export default async function DashboardPage() {
   const user = await getAuthUser()
   if (!user || !user.supplierId) redirect('/login')
 
-  const supplier = SUPPLIERS.find((s) => s.id === user.supplierId)
-  const data     = getSupplierOverviewData(user.supplierId)
+  const [supplier, data] = await Promise.all([
+    getSupplierById(user.supplierId!),
+    getSupplierOverviewData(user.supplierId!),
+  ])
 
   return (
     <div className="space-y-6 max-w-[1280px]">

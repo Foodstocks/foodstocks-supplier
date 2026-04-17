@@ -1,4 +1,4 @@
-import { SUPPLIERS, getProductsBySupplier, getProductWithStatus, ADS_REQUESTS } from '@/lib/mock-data'
+import { getAdminSuppliersData } from '@/lib/db'
 import { formatRupiah, formatNumber, formatDate } from '@/lib/utils'
 import Link from 'next/link'
 import { Users, Package, TrendingUp, Megaphone, CheckCircle, Clock, MapPin, Phone } from 'lucide-react'
@@ -12,22 +12,10 @@ const TIER_CONFIG = {
 }
 
 export default async function AdminSuppliersPage() {
-  const suppliers = SUPPLIERS.map((supplier) => {
-    const products   = getProductsBySupplier(supplier.id).map(getProductWithStatus)
-    const gmv30d     = products.reduce((s, p) => s + p.gmvLast30d, 0)
-    const units30d   = products.reduce((s, p) => s + p.unitsLast30d, 0)
-    const fastMove   = products.filter((p) => p.status === 'fast_move').length
-    const slowMove   = products.filter((p) => p.status === 'slow_move').length
-    const avgRating  = products.length > 0
-      ? products.reduce((s, p) => s + p.avgRating, 0) / products.length
-      : 0
-    const hasActiveAds  = ADS_REQUESTS.some((r) => r.supplierId === supplier.id && (r.status === 'approved' || r.status === 'active'))
-    const hasPendingAds = ADS_REQUESTS.some((r) => r.supplierId === supplier.id && (r.status === 'pending' || r.status === 'reviewing'))
-    return { supplier, products, gmv30d, units30d, fastMove, slowMove, avgRating, hasActiveAds, hasPendingAds }
-  }).sort((a, b) => b.gmv30d - a.gmv30d)
+  const suppliers = await getAdminSuppliersData()
 
-  const totalActive  = SUPPLIERS.filter((s) => s.isActive).length
-  const totalGmv     = suppliers.reduce((s, r) => s + r.gmv30d, 0)
+  const totalActive   = suppliers.filter((s) => s.supplier.isActive).length
+  const totalGmv      = suppliers.reduce((s, r) => s + r.gmv30d, 0)
   const totalFastMove = suppliers.reduce((s, r) => s + r.fastMove, 0)
 
   return (

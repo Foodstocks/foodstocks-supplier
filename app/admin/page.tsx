@@ -1,24 +1,12 @@
-import { SUPPLIERS, getProductsBySupplier, getProductWithStatus, ADS_REQUESTS } from '@/lib/mock-data'
+import { getAdminOverviewData } from '@/lib/db'
 import { formatRupiah, formatNumber } from '@/lib/utils'
 import Link from 'next/link'
 import { Users, TrendingUp, Megaphone, DollarSign, ChevronRight, CheckCircle, Clock } from 'lucide-react'
 import AdminDataImport from '@/components/admin/data-import'
 
 export default async function AdminPage() {
-  const rankings = SUPPLIERS.map((supplier) => {
-    const products   = getProductsBySupplier(supplier.id).map(getProductWithStatus)
-    const gmv30d     = products.reduce((s, p) => s + p.gmvLast30d, 0)
-    const units30d   = products.reduce((s, p) => s + p.unitsLast30d, 0)
-    const fastMove   = products.filter((p) => p.status === 'fast_move').length
-    const hasActive  = ADS_REQUESTS.some((r) => r.supplierId === supplier.id && r.status === 'approved')
-    const hasPending = ADS_REQUESTS.some((r) => r.supplierId === supplier.id && r.status === 'pending')
-    return { supplier, gmv30d, units30d, fastMove, totalSkus: products.length, hasActive, hasPending }
-  }).sort((a, b) => b.gmv30d - a.gmv30d)
-
-  const totalGmv     = rankings.reduce((s, r) => s + r.gmv30d, 0)
-  const pendingCount = ADS_REQUESTS.filter((r) => r.status === 'pending' || r.status === 'reviewing').length
-  const adsRevenue   = ADS_REQUESTS.filter((r) => r.status === 'approved' || r.status === 'completed')
-    .reduce((s, r) => s + ({ starter: 500000, booster: 1500000, premium: 3000000 }[r.packageTier] ?? 0), 0)
+  const overview = await getAdminOverviewData()
+  const { supplierRankings: rankings, totalGmv30d: totalGmv, pendingAdsRequests: pendingCount, activeAdsRevenue: adsRevenue, activeSuppliers, totalSuppliers } = overview
 
   return (
     <div className="space-y-6 max-w-7xl">
@@ -30,7 +18,7 @@ export default async function AdminPage() {
       {/* Summary */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: <Users size={20} className="text-brand-500"/>, label:'Supplier Aktif', value: String(SUPPLIERS.filter(s=>s.isActive).length), sub:`dari ${SUPPLIERS.length} total` },
+          { icon: <Users size={20} className="text-brand-500"/>, label:'Supplier Aktif', value: String(activeSuppliers), sub:`dari ${totalSuppliers} total` },
           { icon: <TrendingUp size={20} className="text-brand-500"/>, label:'GMV 30 Hari', value: formatRupiah(totalGmv, true), sub:'semua supplier' },
           { icon: <Megaphone size={20} className="text-brand-500"/>, label:'Pending Ads', value: String(pendingCount), sub:'request menunggu review' },
           { icon: <DollarSign size={20} className="text-brand-500"/>, label:'Revenue Iklan', value: formatRupiah(adsRevenue, true), sub:'dari program ads' },
@@ -77,7 +65,7 @@ export default async function AdminPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {rankings.map(({ supplier, gmv30d, units30d, fastMove, totalSkus, hasActive, hasPending }, idx) => (
+              {rankings.map(({ supplier, gmv30d, unitsSold30d: units30d, fastMoveCount: fastMove, totalSkus, hasActiveAds: hasActive, hasPendingAds: hasPending }, idx) => (
                 <tr key={supplier.id} className="hover:bg-gray-50 transition">
                   <td className="px-5 py-4 text-sm font-bold text-gray-400">#{idx + 1}</td>
                   <td className="px-4 py-4">

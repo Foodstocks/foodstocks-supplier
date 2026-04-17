@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
-import { getProductsBySupplier, getProductWithStatus, getProductSalesTrend } from '@/lib/mock-data'
+import { getProductsBySupplier } from '@/lib/db'
 import { formatRupiah, formatNumber, STATUS_CONFIG, CHANNEL_CONFIG } from '@/lib/utils'
 import ExportCsvButton from '@/components/ui/export-csv-button'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ export default async function ReportsPage() {
   const user = await getAuthUser()
   if (!user || !user.supplierId) redirect('/login')
 
-  const products = getProductsBySupplier(user.supplierId).map(getProductWithStatus)
+  const products = await getProductsBySupplier(user.supplierId!)
 
   // Summary
   const totalGmv   = products.reduce((s, p) => s + p.gmvLast30d, 0)

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
 import Sidebar from '@/components/layout/sidebar'
 import Topbar from '@/components/layout/topbar'
-import { NOTIFICATIONS } from '@/lib/mock-data'
+import { getUnreadNotificationCount } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,9 +11,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!user) redirect('/login')
   if (user.role !== 'supplier') redirect('/admin')
 
-  const unreadCount = NOTIFICATIONS.filter(
-    (n) => n.supplierId === user.supplierId && !n.isRead
-  ).length
+  const unreadCount = await getUnreadNotificationCount(user.supplierId!)
 
   return (
     <div className="flex min-h-screen bg-[#F4F5F8]">

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
-import { getProductsBySupplier, getProductWithStatus } from '@/lib/mock-data'
+import { getProductsBySupplier } from '@/lib/db'
 import { formatRupiah, formatNumber, CHANNEL_CONFIG } from '@/lib/utils'
 import type { Channel } from '@/lib/types'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ export default async function AnalyticsPage() {
   const user = await getAuthUser()
   if (!user || !user.supplierId) redirect('/login')
 
-  const products = getProductsBySupplier(user.supplierId).map(getProductWithStatus)
+  const products = await getProductsBySupplier(user.supplierId!)
   const totalUnits   = products.reduce((s, p) => s + p.unitsLast30d, 0)
   const totalRevenue = products.reduce((s, p) => s + p.gmvLast30d, 0)
 

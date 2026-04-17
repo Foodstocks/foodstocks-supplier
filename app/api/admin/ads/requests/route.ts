@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
-import { ADS_REQUESTS, SUPPLIERS, PRODUCTS, getProductWithStatus } from '@/lib/mock-data'
+import { prisma } from '@/lib/prisma'
+import { getAllAdsRequests } from '@/lib/db'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const user = await getAuthUser()
   if (!user || user.role !== 'admin') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const requests = ADS_REQUESTS.map((r) => ({
-    ...r,
-    supplier: SUPPLIERS.find((s) => s.id === r.supplierId),
-    product:  PRODUCTS.find((p) => p.id === r.productId) ? getProductWithStatus(PRODUCTS.find((p) => p.id === r.productId)!) : undefined,
-  })).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  const requests = await getAllAdsRequests()
   return NextResponse.json({ requests })
 }
 
@@ -20,11 +19,31 @@ export async function PATCH(request: NextRequest) {
   if (!user || user.role !== 'admin') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
   const { id, status, rejectionReason } = await request.json()
-  const req = ADS_REQUESTS.find((r) => r.id === id)
-  if (!req) return NextResponse.json({ error: 'Request tidak ditemukan' }, { status: 404 })
-  req.status = status
-  if (rejectionReason) req.rejectionReason = rejectionReason
-  req.updatedAt = new Date().toISOString()
-  return NextResponse.json({ request: req })
+  if (!id || !status) {
+    return NextResponse.json({ error: 'id and status required' }, { status: 400 })
+  }
+
+  const statusEnum = (status as string).toUpperCase() as
+    'PENDING' | 'REVIEWING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED'
+
+  const updated = await prisma.adsRequest.update({
+    where: { id },
+    data: {
+      status:          statusEnum,
+      rejectionReason: rejectionReason ?? null,
+      reviewedAt:      new Date(),
+    },
+  })
+
+  return NextResponse.json({
+    request: {
+      ...updated,
+      packageTier: updated.packageTier.toLowerCase(),
+      status:      updated.status.toLowerCase(),
+      createdAt:   updated.createdAt.toISOString(),
+      updatedAt:   updated.updatedAt.toISOString(),
+    },
+  })
 }

@@ -175,11 +175,60 @@ model Notification {
   @@map("notifications")
 }
 
-enum Role             { SUPPLIER ADMIN }
-enum SupplierTier     { SMALL MEDIUM LARGE }
-enum Channel          { SHOPEE TIKTOK WEBSITE LIVE_SHOPEE LIVE_TIKTOK RESELLER }
-enum ProductStatus    { FAST_MOVE NORMAL SLOW_MOVE }
-enum AdsTier          { STARTER BOOSTER PREMIUM }
-enum AdsRequestStatus { PENDING REVIEWING APPROVED REJECTED CANCELLED }
-enum CampaignStatus   { SCHEDULED ACTIVE COMPLETED CANCELLED }
-enum NotificationType { STOCK_LOW FAST_MOVE ADS_APPROVED ADS_REJECTED ADS_STARTED ADS_COMPLETED REVIEW_NEW SYSTEM }
+enum Role {
+  SUPPLIER
+  ADMIN
+}
+
+enum SupplierTier {
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum Channel {
+  SHOPEE
+  TIKTOK
+  WEBSITE
+  LIVE_SHOPEE
+  LIVE_TIKTOK
+  RESELLER
+}
+
+enum ProductStatus {
+  FAST_MOVE
+  NORMAL
+  SLOW_MOVE
+}
+
+enum AdsTier {
+  STARTER
+  BOOSTER
+  PREMIUM
+}
+
+enum AdsRequestStatus {
+  PENDING
+  REVIEWING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum CampaignStatus {
+  SCHEDULED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum NotificationType {
+  STOCK_LOW
+  FAST_MOVE
+  ADS_APPROVED
+  ADS_REJECTED
+  ADS_STARTED
+  ADS_COMPLETED
+  REVIEW_NEW
+  SYSTEM
+}
