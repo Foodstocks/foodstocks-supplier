@@ -6,7 +6,7 @@ import { ADS_PACKAGES } from '@/lib/types'
 import type { AdsRequest, ProductWithStatus, AdsTier } from '@/lib/types'
 import { CheckCircle, XCircle, Clock, Megaphone, ChevronDown } from 'lucide-react'
 
-interface RequestWithDetails extends AdsRequest {
+interface RequestWithDetails extends Omit<AdsRequest, 'supplier'> {
   supplier?: { brandName: string; city?: string }
   product?: ProductWithStatus
 }

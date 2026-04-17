@@ -23,7 +23,7 @@ export interface JWTPayload {
 export type ProductStatus = 'fast_move' | 'normal' | 'slow_move'
 export type Channel = 'shopee' | 'tiktok' | 'website' | 'live_shopee' | 'live_tiktok' | 'reseller'
 export type AdsTier = 'starter' | 'booster' | 'premium'
-export type AdsRequestStatus = 'pending' | 'reviewing' | 'approved' | 'rejected' | 'cancelled'
+export type AdsRequestStatus = 'pending' | 'reviewing' | 'approved' | 'rejected' | 'cancelled' | 'completed' | 'active'
 export type CampaignStatus = 'scheduled' | 'active' | 'completed' | 'cancelled'
 export type NotificationType = 'stock_low' | 'fast_move' | 'ads_approved' | 'ads_rejected' | 'ads_started' | 'ads_completed' | 'review_new' | 'system'
 export type SupplierTier = 'small' | 'medium' | 'large'
