@@ -20,7 +20,7 @@ export default async function DashboardLayout({
   ).length
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-[#F4F5F8]">
       <Sidebar user={user} />
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar user={user} title="" unreadCount={unreadCount} />
