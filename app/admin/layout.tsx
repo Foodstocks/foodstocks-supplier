@@ -3,10 +3,12 @@ import { getAuthUser } from '@/lib/auth'
 import Sidebar from '@/components/layout/sidebar'
 import Topbar from '@/components/layout/topbar'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthUser()
-  if (!user) redirect('/login')
-  if (user.role !== 'admin') redirect('/dashboard')
+  if (!user) return redirect('/login')
+  if (user.role !== 'admin') return redirect('/dashboard')
 
   return (
     <div className="flex min-h-screen bg-gray-100">
