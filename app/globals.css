@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary:        #F97316;
+    --color-primary-hover:  #EA6C0A;
+    --color-primary-subtle: #FFF7ED;
+    --color-bg-page:        #F3F4F6;
+    --color-bg-card:        #FFFFFF;
+    --color-bg-sidebar:     #0A0A0A;
+  }
+
+  html { @apply font-body text-gray-900 antialiased; }
+
+  h1, h2, h3, h4 { @apply font-heading; }
+}
+
+@layer components {
+  /* Scrollbar */
+  ::-webkit-scrollbar       { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-gray-100; }
+  ::-webkit-scrollbar-thumb { @apply bg-gray-300 rounded-full; }
+
+  /* Custom recharts tooltip */
+  .recharts-tooltip-wrapper .custom-tooltip {
+    @apply bg-gray-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .animate-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton 1.5s infinite;
+  }
+  @keyframes skeleton {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+}

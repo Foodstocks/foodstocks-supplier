@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(SUPPLIER)
+  name      String
+  phone     String?
+  isActive  Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  supplier  Supplier?
+
+  @@map("users")
+}
+
+model Supplier {
+  id           String        @id @default(cuid())
+  userId       String        @unique
+  user         User          @relation(fields: [userId], references: [id])
+  brandName    String
+  logoUrl      String?
+  description  String?
+  city         String?
+  contactName  String?
+  contactPhone String?
+  contactWa    String?
+  tier         SupplierTier  @default(SMALL)
+  joinedAt     DateTime      @default(now())
+  isActive     Boolean       @default(true)
+  products     Product[]
+  adsRequests  AdsRequest[]
+  campaigns    AdsCampaign[]
+  notifications Notification[]
+
+  @@map("suppliers")
+}
+
+model Product {
+  id             String              @id @default(cuid())
+  supplierId     String
+  supplier       Supplier            @relation(fields: [supplierId], references: [id])
+  sku            String              @unique
+  name           String
+  description    String?
+  imageUrl       String?
+  category       String?
+  priceSupplier  Decimal             @db.Decimal(12,2)
+  priceSell      Decimal?            @db.Decimal(12,2)
+  weightGram     Int?
+  currentStock   Int                 @default(0)
+  stockThreshold Int                 @default(50)
+  isActive       Boolean             @default(true)
+  listedAt       DateTime            @default(now())
+  dailySales     DailySale[]
+  reviews        Review[]
+  statusCache    ProductStatusCache?
+  adsRequests    AdsRequest[]
+
+  @@index([supplierId])
+  @@map("products")
+}
+
+model DailySale {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id])
+  saleDate      DateTime @db.Date
+  channel       Channel
+  unitsSold     Int      @default(0)
+  grossRevenue  Decimal  @default(0) @db.Decimal(12,2)
+  netRevenue    Decimal? @db.Decimal(12,2)
+  unitsReturned Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  @@unique([productId, saleDate, channel])
+  @@index([productId, saleDate(sort: Desc)])
+  @@map("daily_sales")
+}
+
+model ProductStatusCache {
+  productId        String        @id
+  product          Product       @relation(fields: [productId], references: [id])
+  status           ProductStatus
+  unitsLast7d      Int           @default(0)
+  unitsLast30d     Int           @default(0)
+  gmvLast30d       Decimal       @default(0) @db.Decimal(12,2)
+  wowGrowth        Float?
+  momGrowth        Float?
+  percentileRank   Float?
+  avgRating        Float?
+  totalReviews     Int           @default(0)
+  lastCalculatedAt DateTime      @default(now())
+
+  @@map("product_status_cache")
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id])
+  channel      Channel
+  rating       Int
+  reviewText   String?
+  reviewerName String?
+  reviewDate   DateTime @db.Date
+  isVerified   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([productId])
+  @@map("reviews")
+}
+
+model AdsRequest {
+  id              String           @id @default(cuid())
+  supplierId      String
+  supplier        Supplier         @relation(fields: [supplierId], references: [id])
+  productId       String
+  product         Product          @relation(fields: [productId], references: [id])
+  packageTier     AdsTier
+  notes           String?
+  preferredStart  DateTime?        @db.Date
+  status          AdsRequestStatus @default(PENDING)
+  rejectionReason String?
+  reviewedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  campaign        AdsCampaign?
+
+  @@index([supplierId])
+  @@index([status])
+  @@map("ads_requests")
+}
+
+model AdsCampaign {
+  id           String         @id @default(cuid())
+  requestId    String         @unique
+  request      AdsRequest     @relation(fields: [requestId], references: [id])
+  supplierId   String
+  supplier     Supplier       @relation(fields: [supplierId], references: [id])
+  packageTier  AdsTier
+  priceCharged Decimal        @db.Decimal(12,2)
+  startDate    DateTime       @db.Date
+  endDate      DateTime       @db.Date
+  status       CampaignStatus @default(SCHEDULED)
+  channels     String[]
+  createdAt    DateTime       @default(now())
+
+  @@map("ads_campaigns")
+}
+
+model Notification {
+  id         String           @id @default(cuid())
+  supplierId String
+  supplier   Supplier         @relation(fields: [supplierId], references: [id])
+  type       NotificationType
+  title      String
+  body       String
+  data       Json?
+  isRead     Boolean          @default(false)
+  waSent     Boolean          @default(false)
+  waSentAt   DateTime?
+  createdAt  DateTime         @default(now())
+
+  @@index([supplierId, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+enum Role             { SUPPLIER ADMIN }
+enum SupplierTier     { SMALL MEDIUM LARGE }
+enum Channel          { SHOPEE TIKTOK WEBSITE LIVE_SHOPEE LIVE_TIKTOK RESELLER }
+enum ProductStatus    { FAST_MOVE NORMAL SLOW_MOVE }
+enum AdsTier          { STARTER BOOSTER PREMIUM }
+enum AdsRequestStatus { PENDING REVIEWING APPROVED REJECTED CANCELLED }
+enum CampaignStatus   { SCHEDULED ACTIVE COMPLETED CANCELLED }
+enum NotificationType { STOCK_LOW FAST_MOVE ADS_APPROVED ADS_REJECTED ADS_STARTED ADS_COMPLETED REVIEW_NEW SYSTEM }
