@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
-import { Bell, Menu, LogOut, LayoutDashboard, Package, Megaphone, Users, BarChart3, CalendarDays } from 'lucide-react'
+import { Bell, Menu, LogOut, LayoutDashboard, Package, Megaphone, Users, BarChart3, CalendarDays, BarChart2, FileText } from 'lucide-react'
 import type { AuthUser } from '@/lib/types'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -16,6 +16,8 @@ interface TopbarProps {
 const SUPPLIER_NAV = [
   { href: '/dashboard',               label: 'Dashboard',     icon: LayoutDashboard },
   { href: '/dashboard/products',      label: 'Produk',        icon: Package         },
+  { href: '/dashboard/analytics',     label: 'Analitik',      icon: BarChart2       },
+  { href: '/dashboard/reports',       label: 'Laporan',       icon: FileText        },
   { href: '/dashboard/ads',           label: 'Peluang Iklan', icon: Megaphone       },
   { href: '/dashboard/notifications', label: 'Notifikasi',    icon: Bell            },
 ]

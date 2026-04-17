@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, Package, Megaphone, Bell,
   Users, BarChart3, LogOut, HelpCircle, Settings, ShieldCheck,
-  BarChart2, FileText, RefreshCw,
+  BarChart2, FileText,
 } from 'lucide-react'
 import type { AuthUser } from '@/lib/types'
 
@@ -19,7 +19,6 @@ const SUPPLIER_NAV = [
   { href: '/dashboard/analytics',     label: 'Analitik',      icon: BarChart2       },
   { href: '/dashboard/reports',       label: 'Laporan',       icon: FileText        },
   { href: '/dashboard/ads',           label: 'Peluang Iklan', icon: Megaphone       },
-  { href: '/dashboard/restock',       label: 'Restock',       icon: RefreshCw       },
   { href: '/dashboard/notifications', label: 'Notifikasi',    icon: Bell            },
 ]
 
