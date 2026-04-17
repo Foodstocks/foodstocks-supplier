@@ -5,26 +5,24 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
-  LayoutDashboard, Package, Megaphone, Bell, Settings, LogOut,
-  Users, BarChart3, ChevronRight, ShieldCheck,
+  LayoutDashboard, Package, Megaphone, Bell,
+  Users, BarChart3, LogOut, HelpCircle, Settings, ShieldCheck,
 } from 'lucide-react'
 import type { AuthUser } from '@/lib/types'
 
-interface SidebarProps {
-  user: AuthUser
-}
+interface SidebarProps { user: AuthUser }
 
 const SUPPLIER_NAV = [
   { href: '/dashboard',               label: 'Dashboard',     icon: LayoutDashboard },
-  { href: '/dashboard/products',      label: 'Produk Saya',   icon: Package         },
+  { href: '/dashboard/products',      label: 'Produk',        icon: Package         },
   { href: '/dashboard/ads',           label: 'Peluang Iklan', icon: Megaphone       },
   { href: '/dashboard/notifications', label: 'Notifikasi',    icon: Bell            },
 ]
 
 const ADMIN_NAV = [
-  { href: '/admin',          label: 'Overview',     icon: BarChart3 },
-  { href: '/admin/suppliers',label: 'Supplier',     icon: Users     },
-  { href: '/admin/ads',      label: 'Ads Pipeline', icon: Megaphone },
+  { href: '/admin',           label: 'Overview',     icon: BarChart3 },
+  { href: '/admin/suppliers', label: 'Supplier',     icon: Users     },
+  { href: '/admin/ads',       label: 'Ads Pipeline', icon: Megaphone },
 ]
 
 export default function Sidebar({ user }: SidebarProps) {
@@ -40,17 +38,15 @@ export default function Sidebar({ user }: SidebarProps) {
   }
 
   return (
-    <aside className="hidden lg:flex flex-col w-[220px] min-h-screen bg-[#0F1117] flex-shrink-0 border-r border-white/[0.06]">
+    <aside className="hidden lg:flex flex-col w-[220px] min-h-screen bg-white border-r border-gray-100 flex-shrink-0">
 
       {/* Logo */}
-      <div className="px-5 pt-6 pb-5 border-b border-white/[0.07]">
+      <div className="px-5 pt-6 pb-5">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
-            <Image src="/logo.png" alt="Foodstocks" width={32} height={32} className="object-contain" />
-          </div>
+          <Image src="/logo.png" alt="Foodstocks" width={32} height={32} className="object-contain" />
           <div>
-            <p className="font-heading font-bold text-white text-[13px] leading-none tracking-tight">FoodStocks.id</p>
-            <p className="text-white/35 text-[11px] mt-0.5 tracking-wide">
+            <p className="font-heading font-bold text-[13.5px] text-gray-900 leading-none">FoodStocks.id</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">
               {isAdmin ? 'Admin Panel' : 'Supplier Hub'}
             </p>
           </div>
@@ -58,63 +54,71 @@ export default function Sidebar({ user }: SidebarProps) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4">
-        <p className="text-white/25 text-[10px] font-semibold uppercase tracking-[0.1em] px-2.5 mb-2">
+      <nav className="flex-1 px-3 py-1">
+        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-[0.08em] px-3 mb-2">
           {isAdmin ? 'Admin' : 'Menu'}
         </p>
         <div className="space-y-0.5">
           {navItems.map(({ href, label, icon: Icon }) => {
-            const active = pathname === href || (href !== '/dashboard' && href !== '/admin' && pathname.startsWith(href))
+            const active = pathname === href
+              || (href !== '/dashboard' && href !== '/admin' && pathname.startsWith(href))
             return (
               <Link
                 key={href}
                 href={href}
                 className={cn(
-                  'group flex items-center gap-2.5 px-2.5 h-9 rounded-lg text-[13px] font-medium transition-all relative',
+                  'flex items-center gap-3 px-3 h-10 rounded-xl text-[13.5px] font-medium transition-all',
                   active
-                    ? 'bg-brand-500/15 text-white'
-                    : 'text-white/50 hover:bg-white/[0.06] hover:text-white/90'
+                    ? 'bg-brand-500 text-white shadow-brand'
+                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'
                 )}
               >
-                {active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-brand-500 rounded-full" />
-                )}
-                <Icon size={16} className={active ? 'text-brand-400' : ''} />
-                <span>{label}</span>
-                {active && <ChevronRight size={12} className="ml-auto text-brand-400/70" />}
+                <Icon size={17} className={active ? 'text-white' : 'text-gray-400'} />
+                {label}
               </Link>
             )
           })}
         </div>
       </nav>
 
-      {/* Footer */}
-      <div className="px-3 py-4 border-t border-white/[0.07] space-y-1">
+      {/* Bottom utilities */}
+      <div className="px-3 py-4 border-t border-gray-100 space-y-0.5">
         {isAdmin && (
-          <div className="flex items-center gap-2 px-2.5 py-2 mb-1">
-            <ShieldCheck size={13} className="text-brand-400" />
-            <span className="text-[11px] text-brand-400 font-semibold tracking-wide">Admin Access</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 mb-1">
+            <ShieldCheck size={13} className="text-brand-500" />
+            <span className="text-[11px] font-semibold text-brand-500">Admin Access</span>
           </div>
         )}
 
-        {/* User card */}
-        <div className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg bg-white/[0.05] mb-1">
-          <div className="w-7 h-7 rounded-full bg-brand-500 flex items-center justify-center flex-shrink-0 ring-2 ring-brand-500/30">
-            <span className="text-white text-xs font-bold leading-none">{user.name.charAt(0)}</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white text-[12px] font-medium truncate leading-tight">{user.name}</p>
-            <p className="text-white/35 text-[11px] truncate">{user.email}</p>
+        <Link href="#" className="flex items-center gap-3 px-3 h-9 rounded-xl text-[13px] font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition">
+          <HelpCircle size={16} className="text-gray-400" />
+          Bantuan
+        </Link>
+        <Link href="#" className="flex items-center gap-3 px-3 h-9 rounded-xl text-[13px] font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition">
+          <Settings size={16} className="text-gray-400" />
+          Pengaturan
+        </Link>
+
+        {/* User row */}
+        <div className="pt-2 mt-1 border-t border-gray-100">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50">
+            <div className="w-7 h-7 rounded-full bg-brand-500 flex items-center justify-center flex-shrink-0 ring-2 ring-brand-100">
+              <span className="text-white text-xs font-bold leading-none">{user.name.charAt(0)}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[12px] font-semibold text-gray-800 truncate leading-tight">{user.name}</p>
+              <p className="text-[10px] text-gray-400 truncate">{user.email}</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="p-1 text-gray-400 hover:text-red-500 transition rounded-lg hover:bg-red-50"
+              title="Keluar"
+            >
+              <LogOut size={14} />
+            </button>
           </div>
         </div>
-
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2.5 px-2.5 h-9 w-full rounded-lg text-white/40 hover:bg-white/[0.06] hover:text-white/80 text-[13px] font-medium transition-all"
-        >
-          <LogOut size={15} />
-          <span>Keluar</span>
-        </button>
       </div>
     </aside>
   )
