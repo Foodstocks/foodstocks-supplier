@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
+
+export const dynamic = 'force-dynamic'
 import { NOTIFICATIONS } from '@/lib/mock-data'
 import { formatRelativeTime } from '@/lib/utils'
 import { Bell, TrendingUp, AlertTriangle, CheckCircle, Star, Info, Package } from 'lucide-react'

@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
+
+export const dynamic = 'force-dynamic'
 import { getSupplierOverviewData, SUPPLIERS } from '@/lib/mock-data'
 import { formatRupiah, formatNumber, formatGrowth, formatDateShort, STATUS_CONFIG } from '@/lib/utils'
 import Link from 'next/link'

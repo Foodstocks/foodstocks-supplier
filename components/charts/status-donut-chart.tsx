@@ -1,10 +1,15 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
 interface Props { fastMove: number; normal: number; slowMove: number }
 
 export default function StatusDonutChart({ fastMove, normal, slowMove }: Props) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+  if (!mounted) return <div className="h-44 animate-pulse bg-gray-100 rounded-lg" />
+
   const data = [
     { name: 'Fast-Move', value: fastMove,  color: '#22C55E' },
     { name: 'Normal',    value: normal,     color: '#EAB308' },

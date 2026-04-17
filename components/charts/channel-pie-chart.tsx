@@ -1,11 +1,15 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
-import { CHANNEL_CONFIG } from '@/lib/utils'
-import { formatNumber } from '@/lib/utils'
+import { CHANNEL_CONFIG, formatNumber } from '@/lib/utils'
 import type { ChannelBreakdown } from '@/lib/types'
 
 export default function ChannelPieChart({ data }: { data: ChannelBreakdown[] }) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+  if (!mounted) return <div className="h-36 animate-pulse bg-gray-100 rounded-lg" />
+
   return (
     <div className="flex flex-col gap-3">
       <div className="h-36">

@@ -1,10 +1,15 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { formatDateShort, formatNumber } from '@/lib/utils'
 import type { SalesTrendPoint } from '@/lib/types'
 
 export default function ProductSalesChart({ data }: { data: SalesTrendPoint[] }) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+  if (!mounted) return <div className="h-44 animate-pulse bg-gray-100 rounded-lg" />
+
   const chartData = data.map((d) => ({ ...d, dateLabel: formatDateShort(d.date) }))
   return (
     <div className="h-44">

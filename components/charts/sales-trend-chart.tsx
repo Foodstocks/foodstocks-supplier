@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { formatDateShort, formatNumber } from '@/lib/utils'
 import type { SalesTrendPoint } from '@/lib/types'
@@ -7,6 +8,10 @@ import type { SalesTrendPoint } from '@/lib/types'
 interface Props { data: SalesTrendPoint[] }
 
 export default function SalesTrendChart({ data }: Props) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+  if (!mounted) return <div className="h-48 animate-pulse bg-gray-100 rounded-lg" />
+
   const chartData = data.map((d) => ({ ...d, dateLabel: formatDateShort(d.date) }))
 
   return (
