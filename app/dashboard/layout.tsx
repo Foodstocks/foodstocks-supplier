@@ -4,6 +4,8 @@ import Sidebar from '@/components/layout/sidebar'
 import Topbar from '@/components/layout/topbar'
 import { NOTIFICATIONS } from '@/lib/mock-data'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardLayout({
   children,
 }: {
