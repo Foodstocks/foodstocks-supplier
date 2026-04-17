@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
+import { getProductsBySupplier, getProductWithStatus } from '@/lib/mock-data'
+import ProductImage from '@/components/ui/product-image'
 
 export const dynamic = 'force-dynamic'
-import { getProductsBySupplier, getProductWithStatus } from '@/lib/mock-data'
 import { formatNumber, formatRupiah, STATUS_CONFIG, CHANNEL_CONFIG } from '@/lib/utils'
 import Link from 'next/link'
 import { TrendingUp, TrendingDown, Minus, Megaphone, ChevronRight, AlertTriangle } from 'lucide-react'
@@ -56,8 +57,7 @@ export default async function ProductsPage() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-brand-100 flex-shrink-0 overflow-hidden">
-                          <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover"
-                            onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
+                          <ProductImage src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="min-w-0">
                           <Link href={`/dashboard/products/${p.id}`} className="text-sm font-medium text-gray-900 hover:text-brand-600 truncate block max-w-[180px]">

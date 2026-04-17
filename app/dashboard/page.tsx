@@ -1,13 +1,14 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
-
-export const dynamic = 'force-dynamic'
 import { getSupplierOverviewData, SUPPLIERS } from '@/lib/mock-data'
 import { formatRupiah, formatNumber, formatGrowth, formatDateShort, STATUS_CONFIG } from '@/lib/utils'
 import Link from 'next/link'
 import SalesTrendChart from '@/components/charts/sales-trend-chart'
 import StatusDonutChart from '@/components/charts/status-donut-chart'
+import ProductImage from '@/components/ui/product-image'
 import { TrendingUp, TrendingDown, Package, ShoppingCart, DollarSign, Star, Megaphone, ArrowRight, AlertTriangle } from 'lucide-react'
+
+export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
   const user = await getAuthUser()
@@ -116,7 +117,7 @@ export default async function DashboardPage() {
                 <Link key={p.id} href={`/dashboard/products/${p.id}`}
                   className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition">
                   <div className="w-12 h-12 rounded-lg bg-brand-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                    <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                    <ProductImage src={p.imageUrl} alt={p.name} className="w-full h-full object-cover rounded-lg" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">{p.name}</p>
@@ -128,7 +129,7 @@ export default async function DashboardPage() {
                       {cfg.label}
                     </span>
                     <span className="text-xs font-semibold text-green-600">↑{Math.abs(p.wowGrowth).toFixed(0)}%</span>
-                    <Link href="/dashboard/ads" onClick={(e) => e.stopPropagation()}
+                    <Link href="/dashboard/ads"
                       className="hidden sm:flex items-center gap-1 text-xs bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 rounded-lg font-semibold transition">
                       <Megaphone size={12} /> Iklan
                     </Link>

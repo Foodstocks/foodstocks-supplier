@@ -1,8 +1,9 @@
 import { redirect, notFound } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
+import { PRODUCTS, getProductWithStatus, getProductSalesTrend, getReviewsData } from '@/lib/mock-data'
+import ProductImage from '@/components/ui/product-image'
 
 export const dynamic = 'force-dynamic'
-import { PRODUCTS, getProductWithStatus, getProductSalesTrend, getReviewsData } from '@/lib/mock-data'
 import { formatRupiah, formatNumber, formatDateShort, STATUS_CONFIG, CHANNEL_CONFIG } from '@/lib/utils'
 import Link from 'next/link'
 import { ArrowLeft, Megaphone, Package, Star, AlertTriangle } from 'lucide-react'
@@ -35,8 +36,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
         </Link>
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white rounded-xl border border-gray-200 p-5">
           <div className="w-16 h-16 rounded-xl bg-brand-100 flex-shrink-0 overflow-hidden">
-            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover"
-              onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
+            <ProductImage src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
