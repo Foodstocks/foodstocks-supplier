@@ -1,60 +1,75 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
 interface Props { fastMove: number; normal: number; slowMove: number }
 
 export default function StatusDonutChart({ fastMove, normal, slowMove }: Props) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
-  if (!mounted) return <div className="h-44 animate-pulse bg-gray-100 rounded-lg" />
-
-  const data = [
-    { name: 'Fast-Move', value: fastMove,  color: '#22C55E' },
-    { name: 'Normal',    value: normal,     color: '#EAB308' },
-    { name: 'Slow-Move', value: slowMove,   color: '#EF4444' },
-  ].filter((d) => d.value > 0)
+  if (!mounted) return <div className="h-36 animate-skeleton rounded-xl" />
 
   const total = fastMove + normal + slowMove
 
+  const items = [
+    { label: 'Fast-Move',  count: fastMove, color: '#16A34A', bg: '#DCFCE7', text: '#15803D' },
+    { label: 'Normal',     count: normal,   color: '#CA8A04', bg: '#FEF9C3', text: '#A16207' },
+    { label: 'Slow-Move',  count: slowMove, color: '#DC2626', bg: '#FEE2E2', text: '#B91C1C' },
+  ]
+
   return (
-    <div className="flex flex-col items-center">
-      <div className="h-44 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie data={data} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
-              {data.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-            </Pie>
-            <Tooltip
-              content={({ active, payload }) => {
-                if (!active || !payload?.length) return null
-                const item = payload[0].payload
-                return (
-                  <div className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg">
-                    <p className="font-semibold">{item.name}</p>
-                    <p className="text-gray-300">{item.value} produk ({Math.round((item.value / total) * 100)}%)</p>
-                  </div>
-                )
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+    <div className="space-y-1">
+      {/* Total */}
+      <div className="flex items-baseline gap-1.5 mb-4">
+        <span className="font-heading font-bold text-3xl text-gray-900">{total}</span>
+        <span className="text-sm text-gray-400 font-medium">total SKU</span>
       </div>
-      <div className="space-y-2 w-full">
-        {[
-          { label: 'Fast-Move',  count: fastMove,  color: 'bg-green-500',  text: 'text-green-700'  },
-          { label: 'Normal',     count: normal,     color: 'bg-yellow-500', text: 'text-yellow-700' },
-          { label: 'Slow-Move',  count: slowMove,   color: 'bg-red-500',    text: 'text-red-700'    },
-        ].map(({ label, count, color, text }) => (
-          <div key={label} className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2">
-              <span className={`w-2.5 h-2.5 rounded-full ${color}`} />
-              <span className="text-gray-600 text-xs">{label}</span>
+
+      {/* Stacked bar */}
+      <div className="flex h-2.5 rounded-full overflow-hidden gap-0.5 mb-5">
+        {items.map(({ label, count, color }) => {
+          const pct = total > 0 ? (count / total) * 100 : 0
+          if (pct === 0) return null
+          return (
+            <div
+              key={label}
+              style={{ width: `${pct}%`, backgroundColor: color }}
+              className="rounded-full"
+            />
+          )
+        })}
+      </div>
+
+      {/* Rows */}
+      <div className="space-y-3">
+        {items.map(({ label, count, color, bg, text }) => {
+          const pct = total > 0 ? Math.round((count / total) * 100) : 0
+          return (
+            <div key={label}>
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                  <span className="text-xs font-medium text-gray-600">{label}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-gray-800">{count} SKU</span>
+                  <span
+                    className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                    style={{ backgroundColor: bg, color: text }}
+                  >
+                    {pct}%
+                  </span>
+                </div>
+              </div>
+              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{ width: `${pct}%`, backgroundColor: color }}
+                />
+              </div>
             </div>
-            <span className={`font-semibold text-xs ${text}`}>{count} SKU</span>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

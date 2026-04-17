@@ -1,40 +1,75 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { formatDateShort, formatNumber } from '@/lib/utils'
 import type { SalesTrendPoint } from '@/lib/types'
 
 export default function ProductSalesChart({ data }: { data: SalesTrendPoint[] }) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
-  if (!mounted) return <div className="h-44 animate-pulse bg-gray-100 rounded-lg" />
+  if (!mounted) return <div className="h-52 animate-skeleton rounded-xl" />
 
   const chartData = data.map((d) => ({ ...d, dateLabel: formatDateShort(d.date) }))
+
   return (
-    <div className="h-44">
+    <div className="h-52">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+        <AreaChart data={chartData} margin={{ top: 8, right: 4, left: -24, bottom: 0 }}>
           <defs>
-            <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#F97316" stopOpacity={0.2} />
-              <stop offset="95%" stopColor="#F97316" stopOpacity={0} />
+            <linearGradient id="gradRed2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="#E8161A" stopOpacity={0.15} />
+              <stop offset="100%" stopColor="#E8161A" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <XAxis dataKey="dateLabel" tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
+          <CartesianGrid
+            strokeDasharray="0"
+            horizontal={true}
+            vertical={false}
+            stroke="#F1F1F1"
+          />
+          <XAxis
+            dataKey="dateLabel"
+            tick={{ fontSize: 10, fill: '#C4C9D4', fontFamily: 'Inter, sans-serif' }}
+            tickLine={false}
+            axisLine={false}
+            interval="preserveStartEnd"
+          />
+          <YAxis
+            tick={{ fontSize: 10, fill: '#C4C9D4', fontFamily: 'Inter, sans-serif' }}
+            tickLine={false}
+            axisLine={false}
+            width={40}
+          />
           <Tooltip
+            cursor={{ stroke: '#E8161A', strokeWidth: 1, strokeDasharray: '4 4', strokeOpacity: 0.4 }}
             content={({ active, payload, label }) => {
               if (!active || !payload?.length) return null
               return (
-                <div className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg">
-                  <p className="text-gray-400 mb-1">{label}</p>
-                  <p className="font-semibold">{formatNumber(payload[0]?.value as number)} unit</p>
+                <div style={{
+                  background: '#0F1117',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: 10,
+                  padding: '8px 12px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+                }}>
+                  <p style={{ color: '#6B7280', fontSize: 11, marginBottom: 4 }}>{label}</p>
+                  <p style={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>
+                    {formatNumber(payload[0]?.value as number)} unit
+                  </p>
                 </div>
               )
             }}
           />
-          <Area type="monotone" dataKey="units" stroke="#F97316" strokeWidth={2} fill="url(#g2)" dot={false} activeDot={{ r: 4, fill: '#F97316' }} />
+          <Area
+            type="basis"
+            dataKey="units"
+            stroke="#E8161A"
+            strokeWidth={2}
+            fill="url(#gradRed2)"
+            dot={false}
+            activeDot={{ r: 5, fill: '#E8161A', stroke: '#fff', strokeWidth: 2 }}
+          />
         </AreaChart>
       </ResponsiveContainer>
     </div>
