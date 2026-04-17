@@ -26,7 +26,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   const statusEnum = (status as string).toUpperCase() as
-    'PENDING' | 'REVIEWING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED'
+    'PENDING' | 'REVIEWING' | 'APPROVED' | 'REJECTED' | 'CANCELLED'
 
   const updated = await prisma.adsRequest.update({
     where: { id },
